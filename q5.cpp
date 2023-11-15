@@ -37,3 +37,14 @@ int main() {
 
     return 0;
 }
+/* the output
+Kernel Version:
+Linux Check 5.4.0-1093-gcp #102~18.04.1-Ubuntu SMP Sat Oct 29 06:35:49 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+----------------------------------------
+Memory Information:
+               total        used        free      shared  buff/cache   available
+Mem:           7.8Gi       2.1Gi       3.9Gi        17Mi       1.8Gi       5.4Gi
+Swap:             0B          0B          0B
+----------------------------------------
+*/
+
