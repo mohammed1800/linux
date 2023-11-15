@@ -1,60 +1,81 @@
-#include<iostream>
-#include<algorithm>
-using namespace std;
+#include <iostream>
+#include <vector>
+#include <algorithm>
 
-// fcfs
-int main(){
-    
-    cout<<"Enter the process:";
-    int process,p=1;
-    cin>>process;
-    
-    int arrival[process],burst[process],comp[process],wat[process],tat[process],temp[process],temp1[process];
-    
-    for(int i=0;i<process;i++){
-        cout<<"Enter the arrival time of "<<p++<<":";
-        cin>>arrival[i];
-        temp[i]=arrival[i];
+struct Process {
+    int processId;
+    int arrivalTime;
+    int burstTime;
+    int completionTime;
+    int turnaroundTime;
+    int waitingTime;
+};
+
+bool compareArrivalTime(const Process& a, const Process& b) {
+    return a.arrivalTime < b.arrivalTime;
+}
+
+void calculateTimes(std::vector<Process>& processes) {
+    processes[0].completionTime = processes[0].arrivalTime + processes[0].burstTime;
+    processes[0].turnaroundTime = processes[0].completionTime - processes[0].arrivalTime;
+    processes[0].waitingTime = processes[0].turnaroundTime - processes[0].burstTime;
+
+    for (size_t i = 1; i < processes.size(); ++i) {
+        processes[i].completionTime = processes[i - 1].completionTime + processes[i].burstTime;
+        processes[i].turnaroundTime = processes[i].completionTime - processes[i].arrivalTime;
+        processes[i].waitingTime = processes[i].turnaroundTime - processes[i].burstTime;
     }
+}
+
+void displayResults(const std::vector<Process>& processes) {
+    std::cout << "Process\tArrival Time\tBurst Time\tCompletion Time\tTurnaround Time\tWaiting Time\n";
     
-    sort(temp,temp+process);
-    p=1;
-    for(int i=0;i<process;i++){
-        cout<<"Enter the burst time of "<<p++<<":";
-        cin>>burst[i];
+    for (const auto& process : processes) {
+        std::cout << process.processId << "\t" << process.arrivalTime << "\t\t"
+                  << process.burstTime << "\t\t" << process.completionTime << "\t\t"
+                  << process.turnaroundTime << "\t\t" << process.waitingTime << "\n";
     }
-    
-    for(int i=0;i<process;i++){
-        int value=temp[i],steps=0;
-        
-        for(int i=0;i<process;i++){
-            if(value==arrival[i]){
-                break;
-            }
-            steps++;
-                
-        }
-        
-        comp[i]=burst[steps];
-        if(i!=0){
-            comp[i]+=comp[i-1];
-        }
-        
-        if(i!=0 && temp[i]>comp[i-1]){
-            comp[i]+=temp[i]-comp[i-1];
-        }
-        
-        temp1[i]=burst[steps];
+}
+
+int main() {
+    int n;
+    std::cout << "Enter the number of processes: ";
+    std::cin >> n;
+
+    std::vector<Process> processes(n);
+
+    std::cout << "Enter arrival time and burst time for each process:\n";
+    for (int i = 0; i < n; ++i) {
+        processes[i].processId = i + 1;
+        std::cout << "Process " << processes[i].processId << ":\n";
+        std::cout << "Arrival Time: ";
+        std::cin >> processes[i].arrivalTime;
+        std::cout << "Burst Time: ";
+        std::cin >> processes[i].burstTime;
     }
-    float sum=0,sum1=0;
-    for(int i=0;i<process;i++){
-        tat[i]=comp[i]-temp[i];
-        wat[i]=tat[i]-temp1[i];
-        sum+=tat[i];
-        sum1+=wat[i];
-    }
-    cout<<"The average tat time is :"<<sum/process<<endl;
-    cout<<"The average wat time is :"<<sum1/process<<endl;
-    
+
+    // Sort processes based on arrival time
+    std::sort(processes.begin(), processes.end(), compareArrivalTime);
+
+    calculateTimes(processes);
+    displayResults(processes);
+
     return 0;
 }
+/*the out put
+Enter the number of processes: 3
+Enter arrival time and burst time for each process:
+Process 1:
+Arrival Time: 2
+Burst Time: 4
+Process 2:
+Arrival Time: 5
+Burst Time: 3
+Process 3:
+Arrival Time: 5
+Burst Time: 3
+Process Arrival Time    Burst Time      Completion Time Turnaround Time Waiting Time
+1       2               4               6               4               0
+2       5               3               9               4               1
+3       5               3               12              7               4
+*/
